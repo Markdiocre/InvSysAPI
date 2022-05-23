@@ -6,7 +6,7 @@ router = DefaultRouter()
 router.register('category', CategoryView)
 router.register('user-group',UserGroupView)
 urlpatterns = [
-    path('auth/', include('djoser.urls')),
+    path('auth/',include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
     #Updates Login
     path('api-token-auth/', LoginToken.as_view()),

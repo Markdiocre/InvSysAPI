@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-jwf%f3ph*8f4*v6^v7i@e-n%^whr5@ghg1%3t12)^#9lhimc1y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -59,13 +59,16 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
+    'HIDE_USERS':False,
     'SERIALIZERS': {
          'user_create': 'invsys_back.serializers.UserRegistrationSerializer',
          'user': 'invsys_back.serializers.UserSerializer',
          'current_user': 'invsys_back.serializers.UserSerializer',
     },
     'PERMISSIONS': {
-        'user_list': ['rest_framework.permissions.IsAdminUser'],
+        "user": ["invsys_back.permissions.CurrentUserOrAdminLevel"],
+        "user_list": ["invsys_back.permissions.CurrentUserOrAdminLevel"],
+        "user_delete": ["invsys_back.permissions.CurrentUserOrAdminLevel"]
     }
 }
 
