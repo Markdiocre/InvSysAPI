@@ -4,6 +4,10 @@ from django.contrib.auth.models import Group
 from .models import User, Categories, UserGroup
 from .forms import UserCreationform, UserChangeForm
 
+admin.site.site_header = 'Inventory System'
+admin.site.site_title = 'Inventory System Admin Panel'
+admin.site.index_title = 'Welcome to Inventory System Admin'
+
 
 # Register your models here.
 

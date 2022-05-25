@@ -14,8 +14,8 @@ class UserGroupSerializer(serializers.ModelSerializer):
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
-        fields = ('username','name', 'user_level', 'password', 'last_login')
+        fields = ('username','name', 'user_level','password', 'last_login','is_active')
 
 class UserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
-        fields = ('user_id','username','name', 'user_level', 'last_login',)
+        fields = ('user_id','username','name', 'user_level', 'last_login','is_active')
