@@ -16,4 +16,4 @@ class CurrentUserOrAdminLevel(permissions.BasePermission):
             
     def has_object_permission(self, request, view, obj):
         user = request.user
-        return user.user_level.group_level == 1 or obj.pk == user.pk
+        return user.user_level.group_level == 1 or obj.user_id == user.user_id

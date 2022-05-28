@@ -47,8 +47,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     username = models.CharField(max_length=255, unique=True)
-    user_level = models.ForeignKey(UserGroup, on_delete=models.CASCADE, null= True)
-    last_login = models.DateTimeField()
+    user_level = models.ForeignKey(UserGroup, on_delete=models.CASCADE, null= True,blank=True)
+    last_login = models.DateTimeField(blank=True, null=True)
 
     #Administration Rights (A MUST)
     is_staff = models.BooleanField(default=False)

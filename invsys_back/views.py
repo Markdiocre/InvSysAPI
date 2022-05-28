@@ -1,6 +1,10 @@
 
 from rest_framework import viewsets
+from rest_framework import generics
+from rest_framework import authentication
+from rest_framework import permissions
 from django.contrib.auth.models import update_last_login
+from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -8,7 +12,7 @@ from djoser.views import UserViewSet as UVS
 from djoser.conf import settings
 
 
-from .serializers import CategorySerializer, UserGroupSerializer
+from .serializers import CategorySerializer, UserGroupSerializer, UserSerializer
 from .models import Categories, UserGroup
 from .permissions import AdminLevelOnlyPermission, CurrentUserOrAdminLevel
 
@@ -30,3 +34,4 @@ class LoginToken(ObtainAuthToken):
         token = Token.objects.get(key=result.data['token'])
         update_last_login(None, token.user)
         return result
+

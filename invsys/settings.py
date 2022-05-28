@@ -61,6 +61,7 @@ REST_FRAMEWORK = {
 
 DJOSER = {
     'HIDE_USERS':False,
+    "SET_PASSWORD_RETYPE":True,
     'SERIALIZERS': {
          'user_create': 'invsys_back.serializers.UserRegistrationSerializer',
          'user': 'invsys_back.serializers.UserSerializer',

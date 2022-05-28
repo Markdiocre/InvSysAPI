@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer, UserSerializer as BaseUserSerializer
 from .models import Categories, UserGroup
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,3 +22,6 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 class UserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         fields = ('user_id','username','name', 'user_level', 'last_login','is_active')
+        read_only_fields= None
+
+    
