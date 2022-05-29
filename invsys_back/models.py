@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.conf import settings
 
 
 # Create your models here.
@@ -18,6 +19,56 @@ class UserGroup(models.Model):
 
     def __str__(self):
         return self.group_name
+
+class Product(models.Model):
+    product_id = models.AutoField(primary_key=True)
+    category = models.ForeignKey(Categories, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    measuring_name = models.CharField(max_length=10)
+    reordering_point = models.PositiveIntegerField()
+    selling_price = models.FloatField()
+
+    def __str__(self):
+        return self.name
+
+    def total_quantity(self):
+        batches = Batch.objects.filter(product=self.product_id)
+        total = 0
+        for batch in batches:
+            total = total + batch.quantity
+        return total
+
+    def remarks(self):
+        msg = 'OK'
+        if self.total_quantity() < self.reordering_point:
+            msg = 'For Replenish'
+            return msg
+        return msg
+
+
+class Batch(models.Model):
+    batch_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    batch_name = models.CharField(max_length=20, default='')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
+    date_added = models.DateTimeField(auto_now_add=True)
+    expiration_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return '{} - {}'.format(self.batch_name,self.quantity)
+
+
+class Requesition(models.Model):
+    request_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
+    request_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '{} - {}'.format(self.user,self.product)
 
 # CUSTOM USER CLASS
 class CustomUserManager(BaseUserManager):

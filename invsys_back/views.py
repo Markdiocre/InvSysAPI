@@ -1,20 +1,17 @@
 
 from rest_framework import viewsets
-from rest_framework import generics
-from rest_framework import authentication
-from rest_framework import permissions
+
 from django.contrib.auth.models import update_last_login
-from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from djoser.views import UserViewSet as UVS
-from djoser.conf import settings
+from rest_framework import status
+from rest_framework.response import Response
 
 
-from .serializers import CategorySerializer, UserGroupSerializer, UserSerializer
-from .models import Categories, UserGroup
-from .permissions import AdminLevelOnlyPermission, CurrentUserOrAdminLevel
+from .serializers import BatchSerializer, CategorySerializer, ProductSerializer, RequesitionSerializer, UserGroupSerializer
+from .models import Batch, Categories, Product, Requesition, UserGroup
+from .permissions import AdminLevelOnlyPermission
 
 
 # Create your views here.
@@ -35,3 +32,27 @@ class LoginToken(ObtainAuthToken):
         update_last_login(None, token.user)
         return result
 
+class ProductView(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    permission_classes = [IsAuthenticated,
+    ]
+    serializer_class = ProductSerializer
+
+class BatchView(viewsets.ModelViewSet):
+    queryset = Batch.objects.exclude(quantity=0).order_by('date_added')
+    permission_classes = [IsAuthenticated,]
+    serializer_class = BatchSerializer
+
+class RequesitionView(viewsets.ModelViewSet):
+    queryset = Requesition.objects.all().order_by('request_date')
+    permission_classes = [IsAuthenticated,]
+    serializer_class = RequesitionSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        batch = Batch.objects.get(batch_id = instance.batch.batch_id)
+        batch.quantity = batch.quantity + instance.quantity
+        batch.save()
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
