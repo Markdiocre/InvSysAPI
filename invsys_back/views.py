@@ -39,7 +39,7 @@ class ProductView(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
 
 class BatchView(viewsets.ModelViewSet):
-    queryset = Batch.objects.exclude(quantity=0).order_by('date_added')
+    queryset = Batch.objects.all().order_by('-quantity')
     permission_classes = [IsAuthenticated,]
     serializer_class = BatchSerializer
 

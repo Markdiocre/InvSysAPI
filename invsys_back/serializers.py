@@ -19,6 +19,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['product_id','category','name','measuring_name','reordering_point','selling_price','total_quantity','remarks',]
+        read_only_fields = ['total_quantity','remarks',]
 
 
 class BatchSerializer(serializers.ModelSerializer):
