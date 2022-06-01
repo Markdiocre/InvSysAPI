@@ -27,6 +27,7 @@ class Product(models.Model):
     measuring_name = models.CharField(max_length=10)
     reordering_point = models.PositiveIntegerField()
     selling_price = models.FloatField()
+    
 
     def __str__(self):
         return self.name
@@ -58,6 +59,16 @@ class Batch(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.batch_name,self.quantity)
 
+    def get_product_name(self):
+        return self.product.name
+
+    def get_user_name(self):
+        return self.user.name
+
+    def get_user_department(self):
+        return self.user.user_level.group_name
+
+
 
 class Requesition(models.Model):
     request_id = models.AutoField(primary_key=True)
@@ -66,9 +77,22 @@ class Requesition(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
     request_date = models.DateTimeField(auto_now=True)
+    is_approved = models.BooleanField(default=False)
 
     def __str__(self):
         return '{} - {}'.format(self.user,self.product)
+
+    def get_user_name(self):
+        return self.user.name
+
+    def get_user_department(self):
+        return self.user.user_level.group_name
+
+    def get_batch_name(self):
+        return self.batch.batch_name
+
+    def get_product_name(self):
+        return self.product.name
 
 # CUSTOM USER CLASS
 class CustomUserManager(BaseUserManager):
@@ -125,5 +149,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_user_id(self):
         return self.user_id
+
+    def get_user_level(self):
+        return self.user_level.group_level
+
+    def get_user_group_name(self):
+        return self.user_level.group_name
 
 

@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 from .serializers import BatchSerializer, CategorySerializer, ProductSerializer, RequesitionSerializer, UserGroupSerializer
@@ -48,11 +49,46 @@ class RequesitionView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated,]
     serializer_class = RequesitionSerializer
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        batch = Batch.objects.get(batch_id = instance.batch.batch_id)
-        batch.quantity = batch.quantity + instance.quantity
-        batch.save()
+class DashboardView(APIView):
+    permission_classes = [IsAuthenticated,]
 
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def get(self, request,format=None):
+        total_products = Product.objects.all().count()
+        low_stock_products = []
+        for prod in Product.objects.all():
+            if prod.total_quantity() < prod.reordering_point and prod.total_quantity() > 0:
+                low_stock_products.append(prod)
+
+        out_of_stock = []
+        for prod in Product.objects.all():
+            if prod.total_quantity() == 0:
+                out_of_stock.append(prod)
+        
+        most_stock_product = []
+        for prod in Product.objects.all():
+            if prod.total_quantity() >= 50:
+                most_stock_product.append(prod)
+
+        return Response({
+            "total": total_products,
+            "low_stock_count": len(low_stock_products),
+            "out_of_stock_count": len(out_of_stock),
+            "most_stock_product_count": len(most_stock_product),
+        })
+
+class RecentFiveRequestView(APIView):
+    permission_classes = [IsAuthenticated,]
+
+    def get(self, request, format=None):
+        requesition = Requesition.objects.all().order_by('request_date')[:15]
+        serializer = RequesitionSerializer(requesition, many=True)
+        return Response(serializer.data)
+
+class RecentFiveBatchView(APIView):
+    permission_classes = [IsAuthenticated,]
+    serializer_class = BatchSerializer
+
+    def get(self, request, format=None):
+        batches = Batch.objects.all().order_by('date_added')[:15]
+        serializer = BatchSerializer(batches, many=True)
+        return Response(serializer.data)

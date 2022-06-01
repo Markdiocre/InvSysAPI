@@ -25,26 +25,38 @@ class ProductSerializer(serializers.ModelSerializer):
 class BatchSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Batch
-        fields = '__all__'
+        fields = ['batch_id','user','batch_name','product','quantity','date_added','expiration_date','get_product_name','get_user_name','get_user_department']
+        read_only_fields = ['get_product_name','get_user_name','get_user_department']
 
 class RequesitionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Requesition
-        fields = '__all__'
+        fields = ['request_id','user', 'batch', 'product', 'quantity','request_date','is_approved','get_user_name','get_user_department','get_batch_name','get_product_name']
+        read_only_fields = ['get_user_name','get_user_department','get_batch_name','get_product_name']
 
-    def create(self, validated_data):
-        batch_id = validated_data.get('batch').batch_id
-        batch = Batch.objects.get(batch_id= batch_id)
+    def update(self, instance, validated_data):
+        if(validated_data.get('is_approved') == True ):
+            batch_id = instance.batch.batch_id
+            print(batch_id)
+            batch = Batch.objects.get(batch_id=batch_id)
 
-        #Checks if the batch quantity will be below zero
-        if (batch.quantity - validated_data.get('quantity') < 0 ):
-            raise serializers.ValidationError("Batch quantity must not be below 0 after request")
+            #Checks if the batch quantity will be below zero
+            if (batch.quantity - instance.quantity < 0 ):
+                raise serializers.ValidationError("Batch quantity must not be below 0 after approval")
+            else:
+
+                #Reduce that batch quantity then create the request
+                batch.quantity = batch.quantity - instance.quantity
+                batch.save()
         else:
-
-            #Reduce that batch quantity then create the request
-            batch.quantity = batch.quantity - validated_data.get('quantity')
+            batch_id = instance.batch.batch_id
+            batch = Batch.objects.get(batch_id = batch_id)
+            batch.quantity = batch.quantity + instance.quantity
             batch.save()
-            return Requesition.objects.create(**validated_data)
+
+        instance.is_approved = validated_data.get('is_approved')
+        instance.save()
+        return instance
 
 
 
@@ -53,8 +65,11 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
         fields = ('username','name', 'user_level','password', 'last_login','is_active')
 
 class UserSerializer(BaseUserSerializer):
+    user_level_equivalent = serializers.IntegerField(source='get_user_level')
+    user_group_name = serializers.CharField(source='get_user_group_name')
+
     class Meta(BaseUserSerializer.Meta):
-        fields = ('user_id','username','name', 'user_level', 'last_login','is_active')
-        read_only_fields= None
+        fields = ['user_id','username','name', 'user_level', 'last_login','is_active','user_level_equivalent','user_group_name']
+        read_only_fields= ['user_level_equivalent','user_group_name']
 
     
