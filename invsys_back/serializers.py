@@ -18,7 +18,7 @@ class UserGroupSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['product_id','category','name','measuring_name','reordering_point','selling_price','total_quantity','remarks',]
+        fields = ['product_id','category','name','measuring_name','date_created','reordering_point','selling_price','total_quantity','remarks',]
         read_only_fields = ['total_quantity','remarks',]
 
 

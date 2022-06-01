@@ -86,9 +86,16 @@ class RecentFiveRequestView(APIView):
 
 class RecentFiveBatchView(APIView):
     permission_classes = [IsAuthenticated,]
-    serializer_class = BatchSerializer
 
     def get(self, request, format=None):
         batches = Batch.objects.all().order_by('date_added')[:15]
         serializer = BatchSerializer(batches, many=True)
+        return Response(serializer.data)
+
+class RecentFiveProductView(APIView):
+    permission_classes = [IsAuthenticated,]
+
+    def get(self, request, format=None):
+        products = Product.objects.all().order_by('date_created')[:15]
+        serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)

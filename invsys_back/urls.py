@@ -1,6 +1,6 @@
 from django.urls import path,include
 from rest_framework.routers import DefaultRouter
-from .views import BatchView, CategoryView, LoginToken, ProductView, RequesitionView, UserGroupView,DashboardView, RecentFiveRequestView, RecentFiveBatchView
+from .views import BatchView, CategoryView, LoginToken, ProductView, RequesitionView, UserGroupView,DashboardView, RecentFiveRequestView, RecentFiveBatchView, RecentFiveProductView
 
 router = DefaultRouter()
 router.register('category', CategoryView)
@@ -17,4 +17,5 @@ urlpatterns = [
     path('dashboard/', DashboardView.as_view()),
     path('request/recent/', RecentFiveRequestView.as_view()),
     path('batch/recent/', RecentFiveBatchView.as_view()),
+    path('product/recent/', RecentFiveProductView.as_view()),
 ] + router.urls

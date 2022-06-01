@@ -27,6 +27,7 @@ class Product(models.Model):
     measuring_name = models.CharField(max_length=10)
     reordering_point = models.PositiveIntegerField()
     selling_price = models.FloatField()
+    date_created = models.DateTimeField(auto_created=True)
     
 
     def __str__(self):
