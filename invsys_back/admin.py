@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
-from .models import User, Categories, UserGroup, Batch, Product, Requesition
+from .models import User, Categories, UserGroup, Inventory, Product, Requesition
 from .forms import UserCreationform, UserChangeForm
 
 admin.site.site_header = 'Inventory System'
@@ -39,9 +39,9 @@ class CategoryAdmin(admin.ModelAdmin):
 class UserGroupsAdmin(admin.ModelAdmin):
     list_display = ['user_group_id','group_name','group_level','group_status']
 
-class BatchAdmin(admin.ModelAdmin):
-    list_display = ['batch_id','batch_name', 'product','user', 'quantity','expiration_date','date_added']
-    search_fields=['batch_name','product','user']
+class InventoryAdmin(admin.ModelAdmin):
+    list_display = ['inventory_id', 'product','user', 'quantity','expiration_date','date_purchased']
+    search_fields=['inventory_id','product','user']
 
 class ProductAdmin(admin.ModelAdmin):
     list_display=['product_id','category','name','measuring_name','reordering_point','selling_price','total_quantity','remarks',]
@@ -54,7 +54,7 @@ class RequesitionAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(Categories, CategoryAdmin)
 admin.site.register(UserGroup, UserGroupsAdmin)
-admin.site.register(Batch, BatchAdmin)
+admin.site.register(Inventory, InventoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Requesition, RequesitionAdmin)
 admin.site.unregister(Group)

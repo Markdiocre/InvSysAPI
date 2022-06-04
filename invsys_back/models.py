@@ -27,18 +27,21 @@ class Product(models.Model):
     measuring_name = models.CharField(max_length=10)
     reordering_point = models.PositiveIntegerField()
     selling_price = models.FloatField()
-    date_created = models.DateTimeField(auto_created=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     
 
     def __str__(self):
         return self.name
 
     def total_quantity(self):
-        batches = Batch.objects.filter(product=self.product_id)
+        inventories = Inventory.objects.filter(product=self.product_id)
         total = 0
-        for batch in batches:
-            total = total + batch.quantity
+        for inventory in inventories:
+            total = total + inventory.quantity
         return total
+
+    def get_category_name(self):
+        return self.category.name
 
     def remarks(self):
         msg = 'OK'
@@ -48,17 +51,17 @@ class Product(models.Model):
         return msg
 
 
-class Batch(models.Model):
-    batch_id = models.AutoField(primary_key=True)
+class Inventory(models.Model):
+    inventory_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    batch_name = models.CharField(max_length=20, default='')
+    # reference_no = models.AutoField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
-    date_added = models.DateTimeField(auto_now_add=True)
+    date_purchased = models.DateTimeField(auto_now_add=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return '{} - {}'.format(self.batch_name,self.quantity)
+        return '{} - {}'.format(self.inventory_id,self.quantity)
 
     def get_product_name(self):
         return self.product.name
@@ -69,16 +72,24 @@ class Batch(models.Model):
     def get_user_department(self):
         return self.user.user_level.group_name
 
+    def get_category_name(self):
+        return self.product.category.name
 
 
 class Requesition(models.Model):
+    remarks = [
+        ('a','Accepted'),
+        ('r', 'Rejected'),
+        ('p', 'Pending'),
+    ]
+
     request_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, null=True)
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
     request_date = models.DateTimeField(auto_now=True)
-    is_approved = models.BooleanField(default=False)
+    remarks = models.CharField(choices=remarks, default='p', max_length=2)
 
     def __str__(self):
         return '{} - {}'.format(self.user,self.product)
@@ -89,11 +100,14 @@ class Requesition(models.Model):
     def get_user_department(self):
         return self.user.user_level.group_name
 
-    def get_batch_name(self):
-        return self.batch.batch_name
+    def get_inventory_name(self):
+        return self.inventory.inventory_id
 
     def get_product_name(self):
         return self.product.name
+        
+    def get_remarks(self):
+    	return self.get_remarks_display()
 
 # CUSTOM USER CLASS
 class CustomUserManager(BaseUserManager):
