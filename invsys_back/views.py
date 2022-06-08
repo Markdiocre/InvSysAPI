@@ -154,7 +154,7 @@ class MonthReportView(APIView):
         for product in Product.objects.all():
             grand_total = 0
             total = 0
-            for req in Requesition.objects.all().filter(remarks='a', request_date__month = request.data['month'], request_date__year = request.data['year']):
+            for req in Requesition.objects.all().filter(product = product.product_id,remarks='a', request_date__month = request.data['month'], request_date__year = request.data['year']):
                 total = total + req.quantity
             
             products = ProductSerializer(product).data
@@ -181,7 +181,7 @@ class YearlyReportView(APIView):
         for product in Product.objects.all():
             grand_total = 0
             total = 0
-            for req in Requesition.objects.all().filter(remarks='a', request_date__year = request.data['year']):
+            for req in Requesition.objects.all().filter(product = product.product_id,remarks='a', request_date__year = request.data['year']):
                 total = total + req.quantity
             
             products = ProductSerializer(product).data
@@ -237,7 +237,7 @@ class QuarterlyReportView(APIView):
         for product in Product.objects.all():
             grand_total = 0
             total = 0
-            for req in Requesition.objects.all().filter(remarks='a', request_date__range = (start_date,end_date)):
+            for req in Requesition.objects.all().filter(product = product.product_id,remarks='a', request_date__range = (start_date,end_date)):
                 total = total + req.quantity
             
             products = ProductSerializer(product).data
