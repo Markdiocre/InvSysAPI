@@ -1,6 +1,7 @@
 
-from nis import match
 from rest_framework import viewsets
+from rest_framework import status
+from rest_framework.response import Response
 
 from django.contrib.auth.models import update_last_login
 from rest_framework.permissions import IsAuthenticated
@@ -45,6 +46,27 @@ class ProductView(viewsets.ModelViewSet):
     ]
     serializer_class = ProductSerializer
     pagination_class = StandardResultsSetPagination
+
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+
+        inv = {
+            "product": '',
+            "user": request.data.pop('user', None),
+            "quantity": request.data.pop('quantity', 0),
+            "expiration_date": request.data.pop('expiration_date', None)
+        }
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        inv['product'] = serializer.data['product_id']
+        invSer = InventorySerializer(data=inv)
+        invSer.is_valid(raise_exception=True)
+        invSer.save()
+        return Response(status=status.HTTP_201_CREATED, headers=headers)
+
 
 class InventoryView(viewsets.ModelViewSet):
     queryset = Inventory.objects.all().order_by('-quantity')
