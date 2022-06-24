@@ -1,6 +1,6 @@
 from django.urls import path,include
 from rest_framework.routers import DefaultRouter
-from .views import CategoryView, GetAllCategoryView, GetAllInventoryView, GetAllProductView, InventoryView, LoginToken, MonthReportView, ProductView, QuarterlyReportView, RequesitionView, UserGroupView,DashboardView, RecentInventoryView, RecentProductView, RecentRequestView, YearlyReportView, GetAllUserGroupView
+from .views import CategoryView, GetAllCategoryView, GetAllInventoryView, GetAllProductView, InventoryView, LoginToken, MonthReportView, ProductView, QuarterlyReportView, RequesitionView, UserGroupView,DashboardView, RecentInventoryView, RecentProductView, RecentRequestView, YearlyReportView, GetAllUserGroupView, ForReplenishView
 
 router = DefaultRouter()
 router.register('category', CategoryView)
@@ -21,6 +21,7 @@ urlpatterns = [
     path('request/recent/', RecentRequestView.as_view()),
     path('inventory/recent/', RecentInventoryView.as_view()),
     path('product/recent/', RecentProductView.as_view()),
+    path('product/replenish/', ForReplenishView.as_view()),
 
     #Creation endpoints, Loads all instead of paginated
     path('inventory/all/', GetAllInventoryView.as_view()),

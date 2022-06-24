@@ -107,11 +107,23 @@ class DashboardView(APIView):
             "most_stock_product_count": len(most_stock_product),
         })
 
+class ForReplenishView(APIView):
+    permission_classes = [IsAuthenticated,]
+
+    def get(self, request, format=None):
+        out_of_stock = []
+        for prod in Product.objects.all():
+            if prod.total_quantity() == 0:
+                serializer = ProductSerializer(prod)
+                out_of_stock.append(serializer.data)
+
+        return Response({"out_of_stock": out_of_stock})
+
 class RecentRequestView(APIView):
     permission_classes = [IsAuthenticated,]
 
     def get(self, request, format=None):
-        requesition = Requesition.objects.all().order_by('request_date')[:15]
+        requesition = Requesition.objects.all().order_by('-request_date')[:15]
         serializer = RequesitionSerializer(requesition, many=True)
         return Response(serializer.data)
 
@@ -127,7 +139,7 @@ class RecentProductView(APIView):
     permission_classes = [IsAuthenticated,]
 
     def get(self, request, format=None):
-        products = Product.objects.all().order_by('date_created')[:15]
+        products = Product.objects.all().order_by('-date_created')[:15]
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
